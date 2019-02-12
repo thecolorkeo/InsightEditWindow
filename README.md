@@ -14,11 +14,13 @@ My product is an analytics page for analyzing site-wide user behavior. I analyze
 
 # Pipeline
 -----------------
-
-S3 -> Spark -> TimescaleDB (Postgres) -> Dash
+S3 -> Spark -> TimescaleDB (Postgres) -> Dash 
 ![alt text](https://github.com/thecolorkeo/InsightWiki/blob/dev/docs/Pipeline.png "EditWindow Pipeline")
 
+I downloaded revision history from all pages on the English version of Wikipedia to an S3 bucket, which were in the form of zipped XMLs. I used Spark (Databricks Spark XML package) to parse these xmls into a dataframe. I wrote these files out to TimescaleDB, and created an interactive website with Plotly Dash and Flask. I used Airflow to automate downloading and parsing the Wikipedia files from S3.
+
 Data Source: https://dumps.wikimedia.org/enwiki/latest/
+
 To access the latest versions of all Wikipedia pages including all revisions, go to this page and download files with the prefix "enwiki-latest-pages-meta-history"[1-27]. Wikipedia publishes the full site in 27 parts.
 
 XML parsing package with spark: https://github.com/databricks/spark-xml
