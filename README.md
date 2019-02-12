@@ -1,16 +1,22 @@
-#EDIT WINDOW
+# EDIT WINDOW
+
 ***A window into Wikipedia editing behavior***
+
 I completed this project as a fellow at Insight Data Engineering in NYC.
 
 ***
 Wikipedia [is a system of public record].
 
 ***
-#Pipeline
+
+# Pipeline
+
 S3 -> Spark -> TimescaleDB (Postgres) -> Dash
 
 ***
-#Environment
+
+# Environment
 
 ***
-#Run Instructions
+
+# Run Instructions
