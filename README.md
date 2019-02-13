@@ -15,7 +15,7 @@ My product is an analytics page for analyzing site-wide user behavior. I analyze
 # Pipeline
 -----------------
 S3 -> Spark -> TimescaleDB (Postgres) -> Dash 
-![alt text](https://github.com/thecolorkeo/InsightWiki/blob/dev/docs/Pipeline.png "EditWindow Pipeline")
+![alt text](https://github.com/thecolorkeo/InsightWiki/blob/dev/Pipeline.png "EditWindow Pipeline")
 
 I downloaded revision history from all pages on the English version of Wikipedia to an S3 bucket, which were in the form of zipped XMLs. I used Spark (Databricks Spark XML package) to parse these xmls into a dataframe. I wrote these files out to TimescaleDB, and created an interactive website with Plotly Dash and Flask. I used Airflow to automate downloading and parsing the Wikipedia files from S3.
 
