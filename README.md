@@ -33,3 +33,11 @@ XML parsing package with spark: https://github.com/databricks/spark-xml
 Install AWS CLI and [Pegasus](https://github.com/InsightDataScience/pegasus), which is Insight's automatic cluster creator. Set the configuration in workers.yml and master.yml (3 workers and 1 master), then use Pegasus commands to spin up the cluster and install Hadoop and Spark. Follow the [instructions on Timescale's website](https://blog.timescale.com/tutorial-installing-timescaledb-on-aws-c8602b767a98/) for how to install Timescale on an EC2 instance.
 
 ### Run Instructions
+Start Spark and Hadoop on your EC2 cluster.
+
+Download the 27 files off wikipedia's website into an S3 bucket with the name format "history#.xml.bz2" and replace # with the respective number between 1 and 27. Then, run "spark-up-history.sh #" for each of the files in S3.
+
+Run "sudo python app2.py" from the dashapp folder to start the website on port 80 of the EC2 instance. You can visit it at <public-dns>:80.
+
+# Testing
+Wikipedia offers the option to [download individual pages](https://en.wikipedia.org/wiki/Special:Export) in xml format. The folder test/ contains a unit test for the entry for New York City.
