@@ -37,7 +37,7 @@ Start Spark and Hadoop on your EC2 cluster.
 
 Download the 27 files off wikipedia's website into an S3 bucket with the name format "history#.xml.bz2" and replace # with the respective number between 1 and 27. Then, run "spark-up-history.sh #" for each of the files in S3.
 
-Run "sudo python app2.py" from the dashapp folder to start the website on port 80 of the EC2 instance. You can visit it at &lt;public-dns&lt;:80.
+Run "sudo python app2.py" from the dashapp folder to start the website on port 80 of the EC2 instance. You can visit it at &lt;public-dns>:80.
 
 # Testing
 Wikipedia offers the option to [download individual pages](https://en.wikipedia.org/wiki/Special:Export) in xml format. The folder test/ contains a unit test for the entry for New York City.
