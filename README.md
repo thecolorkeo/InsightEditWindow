@@ -39,5 +39,5 @@ Download the 27 files off wikipedia's website into an S3 bucket with the name fo
 
 Run "sudo python app2.py" from the dashapp folder to start the website on port 80 of the EC2 instance.
 
-# Testing
+### Testing
 Wikipedia offers the option to [download individual pages](https://en.wikipedia.org/wiki/Special:Export) in xml format. The folder test/ contains a unit test for the entry for New York City.
