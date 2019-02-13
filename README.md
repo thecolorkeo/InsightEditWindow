@@ -8,7 +8,7 @@ I completed this project as a fellow at Insight Data Engineering in NYC.
 
 Wikipedia's credibility depends on the edits behind its articles being transparent. But on their website, it's hard to compare edits beyond the scope of one user's or one page's revisions.
 
-My product is an analytics page for analyzing site-wide user behavior. I analyze 500GB of Wikipedia pages in XML, process them in Spark, and store in TimescaleDB. On my website, there is a panel of pre-selected top stats, and clicking them allows users to dig deeper into different metrics.
+My product is an analytics page for analyzing site-wide user behavior. I analyze 500GB of Wikipedia pages in XML, process them in Spark, and store in TimescaleDB. On my [website](editwindow.wiki), there is a panel of pre-selected top stats, and clicking them allows users to dig deeper into different metrics.
 
 ***
 
