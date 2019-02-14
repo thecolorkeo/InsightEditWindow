@@ -1,0 +1,29 @@
+/*!
+ * Start Bootstrap - Heroic Features (https://startbootstrap.com/template-overviews/heroic-features)
+ * Copyright 2013-2019 Start Bootstrap
+ * Licensed under MIT (https://github.com/BlackrockDigital/startbootstrap-heroic-features/blob/master/LICENSE)
+ */
+.button1 {
+    border-radius: 12px;
+    background-color: white;
+    color: black;
+    border: 2px solid #555555;
+    float: left;
+    width: 20%;
+    height: 7em;
+    font-size:2.5em;
+}
+.button1:hover {
+    background-color: #555555;
+    color: white;
+}
+.app-header {
+    height: 60px;
+    line-height: 60px;
+    border-bottom: thin lightgrey solid;
+}
+
+.app-header .app-header--title {
+    font-size: 22px;
+    padding-left: 5px;
+}
