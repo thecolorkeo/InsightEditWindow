@@ -2,7 +2,7 @@
 
 ***A window into Wikipedia editing behavior***
 
-I completed this project as a fellow at Insight Data Engineering in NYC.
+I completed this project in 3 weeks as a fellow at Insight Data Engineering in NYC, January 2019.
 
 ***
 
@@ -37,7 +37,7 @@ Start Spark and Hadoop on your EC2 cluster.
 
 Download the 27 files off wikipedia's website into an S3 bucket with the name format `"history#.xml.<__>.bz2"` and replace # with the respective number between 1 and 27. Then, run `spark-up-history.sh #` for each of the files in S3.
 
-Run "sudo python app2.py" from the dashapp folder to start the website on port 80 of the EC2 instance.
+Run "sudo python app2.py" from the dashapp folder to start the website on port 80 of the EC2 instance running Timescale.
 
 ### Testing
 Wikipedia offers the option to [download individual pages](https://en.wikipedia.org/wiki/Special:Export) in xml format. The folder test/ contains a unit test for the entry for New York City.
