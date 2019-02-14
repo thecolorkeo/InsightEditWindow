@@ -35,7 +35,7 @@ Install AWS CLI and [Pegasus](https://github.com/InsightDataScience/pegasus), wh
 ### Run Instructions
 Start Spark and Hadoop on your EC2 cluster.
 
-Download the 27 files off wikipedia's website into an S3 bucket with the name format "history#.xml.bz2" and replace # with the respective number between 1 and 27. Then, run "spark-up-history.sh #" for each of the files in S3.
+Download the 27 files off wikipedia's website into an S3 bucket with the name format `"history#.xml.<__>.bz2"` and replace # with the respective number between 1 and 27. Then, run `spark-up-history.sh #` for each of the files in S3.
 
 Run "sudo python app2.py" from the dashapp folder to start the website on port 80 of the EC2 instance.
 
