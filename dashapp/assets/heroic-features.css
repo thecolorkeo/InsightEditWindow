@@ -8,9 +8,10 @@
     background-color: white;
     color: black;
     border: 2px solid #555555;
-    width: 250px;
-    height: 200px;
-    font-size:16pt;
+    float: left;
+    width: 20%;
+    height: 7em;
+    font-size:2.5em;
 }
 .button1:hover {
     background-color: #555555;
