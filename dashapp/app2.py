@@ -6,6 +6,7 @@ from sqlalchemy_utils import database_exists, create_database
 from datetime import datetime as dt
 import pandas as pd
 import psycopg2
+import json
 
 '''
 Dash website that queries Timescale.
@@ -74,7 +75,7 @@ index_page = html.Div([
                 }
             }, className = 'graph',
         )
-    ])
+    ]),
 ])
 
 
@@ -91,7 +92,18 @@ page_1_layout = html.Div([
     ),
     html.Div('(Press page up/down to switch months quickly)', style = {'font-size': '2vh'}),
     html.Div(id='output-container-date-picker-range-1'), html.Br(),
+    html.Div('Click on one of the bars to see more statistics', style = {'font-size': '3vh'}), html.Br(),
+    dcc.DatePickerRange(
+        id='my-date-picker-range-1.1',
+        min_date_allowed=dt(2001, 1, 15),
+        max_date_allowed=dt.today(),
+        start_date=dt(2001, 1, 1),
+        end_date=dt(2018, 12, 31),
+        day_size=60,
+    ),
+    html.Div(id='click_output'), html.Br(),
 ])
+# Callback for first date picker
 @app.callback(
     dash.dependencies.Output('output-container-date-picker-range-1', 'children'),
     [dash.dependencies.Input('my-date-picker-range-1', 'start_date'),
@@ -113,7 +125,7 @@ def page_1_output(start_date, end_date):
         return 'Select a date to see it displayed here'
     else:
         return dcc.Graph(
-	           id='example',
+	           id='example1',
 	           figure={
 	               'data': [{'x': query_results['username'], 'y': query_results['frequency'], \
 			   'type': 'bar', 'name': 'Users'}],
@@ -125,6 +137,49 @@ def page_1_output(start_date, end_date):
 
 	           }, className = 'graph',
 	)
+# Callback for click event on graph 1
+@app.callback(
+    dash.dependencies.Output('click_output', 'children'),
+    [dash.dependencies.Input('example1', 'clickData'),
+     dash.dependencies.Input('my-date-picker-range-1.1', 'start_date'),
+     dash.dependencies.Input('my-date-picker-range-1.1', 'end_date')])
+def clicked_1(clickData, start_date, end_date):
+    value = clickData['points'][0]['x']
+    sql_query = "SELECT CAST(time AS DATE), count(*) as frequency FROM revs WHERE lower(username) = lower('"
+    if value is not None and start_date is not None and end_date is not None:
+        start_date = dt.strptime(start_date, '%Y-%m-%d')
+        start_date_string = start_date.strftime("'%Y-%m-%d'")
+        end_date = dt.strptime(end_date, '%Y-%m-%d')
+        end_date_string = end_date.strftime("'%Y-%m-%d'")
+        sql_query = sql_query + str(value) + "') AND time BETWEEN " + start_date_string + " AND " + end_date_string \
+            + " GROUP BY CAST(time as DATE);"
+    query_results=pd.read_sql_query(sql_query,con)
+    revs = []
+    for i in range(0,query_results.shape[0]):
+        revs.append(dict(time=query_results.iloc[i]['time'], frequency=query_results.iloc[i]['frequency']))
+    if len(sql_query) == 0:
+        return 'Select a date to see it displayed here'
+    else:
+        return dcc.Graph(
+                    id='example1.1',
+                    figure={
+                        'data': [{'x': query_results['time'], 'y': query_results['frequency'], \
+                            'type': 'line', 'name': 'Users'}],
+                        'layout': {
+                            'title': 'Frequency of edits by ' + str(value) + ' by date',
+                            'titlefont': {'size': 60},
+                            'yaxis': {'tickfont': {'size': 30}},
+                            'xaxis': {
+                               'type': 'date',
+                               'tickformat': '%Y-%m-%d',
+                               'tickmode': 'linear',
+                               'tickfont': {'size': 30},
+                               'automargin': True,
+                               'dtick': 86400000.0*59 #one day * x
+                            }
+                        }
+                    }, className = 'graph',
+                )
 
 page_2_layout = html.Div([
     html.Div('Most Edits in 2018 (without bots)', className='page-title'),
@@ -138,7 +193,9 @@ page_2_layout = html.Div([
         day_size=60,
     ),
     html.Div('(Press page up/down to switch months quickly)', style = {'font-size': '2vh'}),
-    html.Div(id='output-container-date-picker-range-2'), html.Br()
+    html.Div(id='output-container-date-picker-range-2'), html.Br(),
+    html.Div('Click on one of the bars to see more statistics', style = {'font-size': '3vh'}), html.Br(),
+    html.Div(id='click_output_2'),
 ])
 @app.callback(
     dash.dependencies.Output('output-container-date-picker-range-2', 'children'),
@@ -161,7 +218,7 @@ def page_2_output(start_date, end_date):
         return 'Select a date to see it displayed here'
     else:
         return dcc.Graph(
-                id='example',
+                id='example-2',
                 figure={
                     'data': [{'x': query_results_2['username'], 'y': query_results_2['frequency'], \
 			'type': 'bar', 'name': 'Users'}],
@@ -172,16 +229,59 @@ def page_2_output(start_date, end_date):
                     }
                 }, className = 'graph',
         )
+# Callback for click event on graph 2
+@app.callback(
+    dash.dependencies.Output('click_output_2', 'children'),
+    [dash.dependencies.Input('example-2', 'clickData'),
+     dash.dependencies.Input('my-date-picker-range-2', 'start_date'), #########
+     dash.dependencies.Input('my-date-picker-range-2', 'end_date')]) ########
+def clicked_2(clickData, start_date, end_date):
+    value = clickData['points'][0]['x']
+    sql_query = "SELECT CAST(time AS DATE), count(*) as frequency FROM revs WHERE lower(username) = lower('"
+    if value is not None and start_date is not None and end_date is not None:
+        start_date = dt.strptime(start_date, '%Y-%m-%d')
+        start_date_string = start_date.strftime("'%Y-%m-%d'")
+        end_date = dt.strptime(end_date, '%Y-%m-%d')
+        end_date_string = end_date.strftime("'%Y-%m-%d'")
+        sql_query = sql_query + str(value) + "') AND time BETWEEN " + start_date_string + " AND " + end_date_string \
+            + " GROUP BY CAST(time as DATE);"
+    query_results=pd.read_sql_query(sql_query,con)
+    revs = []
+    for i in range(0,query_results.shape[0]):
+        revs.append(dict(time=query_results.iloc[i]['time'], frequency=query_results.iloc[i]['frequency']))
+    if len(sql_query) == 0:
+        return 'Select a date to see it displayed here'
+    else:
+        return dcc.Graph(
+                    id='example-2.1',
+                    figure={
+                        'data': [{'x': query_results['time'], 'y': query_results['frequency'], \
+                            'type': 'line', 'name': 'Users'}],
+                        'layout': {
+                            'title': 'Frequency of edits by ' + str(value) + ' by date',
+                            'titlefont': {'size': 60},
+                            'yaxis': {'tickfont': {'size': 30}},
+                            'xaxis': {
+                               'type': 'date',
+                               'tickformat': '%Y-%m-%d',
+                               'tickmode': 'linear',
+                               'tickfont': {'size': 30},
+                               'automargin': True,
+                               'dtick': 86400000.0*59 #one day * x
+                            }
+                        }
+                    }, className = 'graph',
+                )
 
 page_3_layout = html.Div([
     html.Div('Frequency of edits by user', className='page-title'),
     html.Div(id='page-3-content'), html.Br(),
-    dcc.Input(id='name-picker-3', type='text', value='cluebot ng', style = {'font-size': '4vh'}), html.Br(),
+    dcc.Input(id='name-picker-3', type='text', value='Ser Amantio Di Nicolao', style = {'font-size': '4vh'}), html.Br(),
     dcc.DatePickerRange(
         id='my-date-picker-range-3',
         min_date_allowed=dt(2001, 1, 15),
         max_date_allowed=dt.today(),
-        start_date=dt(2008, 1, 1),
+        start_date=dt(2018, 10, 1),
         end_date=dt(2018, 12, 31),
         day_size=60,
     ),
@@ -224,7 +324,7 @@ def page_3_output(value, start_date, end_date):
 	                       'tickmode': 'linear',
 			       'tickfont': {'size': 30},
 			       'automargin': True,
-	                       'dtick': 86400000.0*29.5 #one day * x
+	                       'dtick': 86400000.0*7 #one day * x
 	                    }
 			}
 	            }, className = 'graph',
@@ -233,12 +333,12 @@ def page_3_output(value, start_date, end_date):
 page_4_layout = html.Div([
     html.Div('Length of pages edited by user', className='page-title'),
     html.Div(id='page-4-content'), html.Br(),
-    dcc.Input(id='name-picker-4', type='text',value='cluebot ng', style = {'font-size': '4vh'}), html.Br(),
+    dcc.Input(id='name-picker-4', type='text',value='Ser Amantio Di Nicolao', style = {'font-size': '4vh'}), html.Br(),
     dcc.DatePickerRange(
         id='my-date-picker-range-4',
         min_date_allowed=dt(2001, 1, 15),
         max_date_allowed=dt.today(),
-        start_date=dt(2018, 1, 1),
+        start_date=dt(2018, 10, 1),
         end_date=dt(2018, 12, 31),
         day_size=60,
     ),
@@ -270,7 +370,7 @@ def page_4_output(value, start_date, end_date):
                     id='example4',
                     figure={
                         'data': [{'x': query_results_4['length'], 'y': query_results_4['frequency'], \
-			    'type': 'line', 'name': 'Users'}],
+			    'type': 'bar', 'name': 'Users'}],
                         'layout': {
                             'title': 'Length of edits by ' + str(value),
 			    'titlefont': {'size': 60},
