@@ -26,13 +26,15 @@ app.layout = html.Div([
 	dcc.Link('Home', className = 'header-button', href = '/'),
         html.A('About', href = 'https://github.com/thecolorkeo/InsightWiki', target = '_blank', className = 'header-button'),
         dcc.Link('Contact', className = 'header-button', href = '/contact'),
-        html.A('Resume', href = 'https://rawcdn.githack.com/thecolorkeo/Resume/ab63fb2f799f3b78fac5c71f5f47360b1dfca3c3/Keo_Chan_Final.pdf', target = '_blank', className = 'header-button'),
+        html.A('Resume', href = 'https://rawcdn.githack.com/thecolorkeo/Resume/ab63fb2f799f3b78fac5c71f5f47360b1dfca3c3/Keo_Chan_Final.pdf', \
+	    target = '_blank', className = 'header-button'),
     ], className = 'app-header'),
     html.Div(id='page-content'),
 ])
 
 
-sql_query_0 = "SELECT CAST(time AS DATE), count(*) as frequency FROM revs WHERE time BETWEEN '2018-10-01' AND '2018-12-31' GROUP BY CAST(time AS DATE)"
+sql_query_0 = "SELECT CAST(time AS DATE), count(*) as frequency FROM revs " \
+    + "WHERE time BETWEEN '2018-10-01' AND '2018-12-31' GROUP BY CAST(time AS DATE)"
 query_results_0 = pd.read_sql_query(sql_query_0, con)
 revs_0 = []
 for i in range(0,query_results_0.shape[0]):
@@ -53,16 +55,19 @@ index_page = html.Div([
             figure={
                 'data': [{'x': query_results_0['time'], 'y': query_results_0['frequency'], 'type': 'line', 'name': 'Users'}],
                 'layout': {
-                    'title': 'Last 3 months of edits',
+                    'title': 'Most recent 3 months of edits',
+		    'titlefont': {'size': 60},
+		    'yaxis': {'tickfont': {'size': 30}},
                     'xaxis': {
                        'type': 'date',
                        'tickformat': '%Y-%m-%d',
                        'tickmode': 'linear',
-                       'dtick': 86400000.0 * 7, #one day * x
-		       'font-size': 48,
-                    }
+		       'automargin': True,
+                       'dtick': 86400000.0 * 7, #one day * n
+		       'tickfont': dict(size=30),
+              	    },
                 }
-            }, style = {'page-break-before': 'always', 'height': '75vh', 'width': '200vh', 'font-size': 48},
+            }, className = 'graph',
         )
     ])
 ])
@@ -92,7 +97,8 @@ def page_1_output(start_date, end_date):
         start_date_string = start_date.strftime("'%Y-%m-%d'")
         end_date = dt.strptime(end_date, '%Y-%m-%d')
         end_date_string = end_date.strftime("'%Y-%m-%d'")
-        sql_query = sql_query + start_date_string + " AND " + end_date_string + " GROUP BY username ORDER BY count(*) DESC LIMIT 10;"
+        sql_query = sql_query + start_date_string + " AND " + end_date_string \
+	    + " GROUP BY username ORDER BY count(*) DESC LIMIT 10;"
     query_results = pd.read_sql_query(sql_query,con)
     revs = []
     for i in range(0,query_results.shape[0]):
@@ -103,8 +109,14 @@ def page_1_output(start_date, end_date):
         return dcc.Graph(
 	           id='example',
 	           figure={
-	               'data': [{'x': query_results['username'], 'y': query_results['frequency'], 'type': 'bar', 'name': 'Users'}],
-	               'layout': {'title': 'Most Edits',}
+	               'data': [{'x': query_results['username'], 'y': query_results['frequency'], \
+			   'type': 'bar', 'name': 'Users'}],
+	               'layout': {'title': 'Number of edits per user',
+                           'titlefont': {'size': 60},
+                           'yaxis': {'tickfont': {'size': 30}},
+                           'xaxis': {'tickfont': {'size': 30}, 'automargin': True},
+		       }
+
 	           }, className = 'graph',
 	)
 
@@ -132,7 +144,8 @@ def page_2_output(start_date, end_date):
         start_date_string = start_date.strftime("'%Y-%m-%d'")
         end_date = dt.strptime(end_date, '%Y-%m-%d')
         end_date_string = end_date.strftime("'%Y-%m-%d'")
-        sql_query_2 = sql_query_2 + start_date_string + " AND " + end_date_string + " GROUP BY username ORDER BY count(*) DESC LIMIT 10;"
+        sql_query_2 = sql_query_2 + start_date_string + " AND " + end_date_string \
+	    + " GROUP BY username ORDER BY count(*) DESC LIMIT 10;"
     query_results_2=pd.read_sql_query(sql_query_2,con)
     revs_2 = []
     for i in range(0,query_results_2.shape[0]):
@@ -143,15 +156,15 @@ def page_2_output(start_date, end_date):
         return dcc.Graph(
                 id='example',
                 figure={
-                    'data': [{'x': query_results_2['username'], 'y': query_results_2['frequency'], 'type': 'bar', 'name': 'Users'}],
-                    'layout': {'title': 'Most Edits (non-bot)'}
+                    'data': [{'x': query_results_2['username'], 'y': query_results_2['frequency'], \
+			'type': 'bar', 'name': 'Users'}],
+                    'layout': {'title': 'Number of edits per user',
+                        'titlefont': {'size': 60},
+                        'yaxis': {'tickfont': {'size': 30}},
+                        'xaxis': {'tickfont': {'size': 30}, 'automargin': True},
+                    }
                 }, className = 'graph',
         )
-@app.callback(
-    dash.dependencies.Output('test', 'children'),
-    [dash.dependencies.Input('example', 'clickData')])
-def page_2_con(clickData):
-    return index_page
 
 page_3_layout = html.Div([
     html.Div('Frequency of edits by user', className='page-title'),
@@ -178,7 +191,8 @@ def page_3_output(value, start_date, end_date):
         start_date_string = start_date.strftime("'%Y-%m-%d'")
         end_date = dt.strptime(end_date, '%Y-%m-%d')
         end_date_string = end_date.strftime("'%Y-%m-%d'")
-        sql_query_3 = sql_query_3 + str(value) + "') AND time BETWEEN " + start_date_string + " AND " + end_date_string + " GROUP BY CAST(time as DATE);"
+        sql_query_3 = sql_query_3 + str(value) + "') AND time BETWEEN " + start_date_string + " AND " + end_date_string \
+	    + " GROUP BY CAST(time as DATE);"
     query_results_3=pd.read_sql_query(sql_query_3,con)
     revs_3 = []
     for i in range(0,query_results_3.shape[0]):
@@ -189,13 +203,18 @@ def page_3_output(value, start_date, end_date):
         return dcc.Graph(
 	            id='example3',
 	    	    figure={
-	                'data': [{'x': query_results_3['time'], 'y': query_results_3['frequency'], 'type': 'line', 'name': 'Users'}],
+	                'data': [{'x': query_results_3['time'], 'y': query_results_3['frequency'], \
+			    'type': 'line', 'name': 'Users'}],
 	                'layout': {
 	                    'title': 'Frequency of edits by ' + str(value) + ' by date',
-	                    'xaxis': {
+                            'titlefont': {'size': 60},
+                            'yaxis': {'tickfont': {'size': 30}},
+                            'xaxis': {
 	                       'type': 'date',
 	                       'tickformat': '%Y-%m-%d',
 	                       'tickmode': 'linear',
+			       'tickfont': {'size': 30},
+			       'automargin': True,
 	                       'dtick': 86400000.0*29.5 #one day * x
 	                    }
 			}
@@ -227,7 +246,8 @@ def page_4_output(value, start_date, end_date):
         start_date_string = start_date.strftime("'%Y-%m-%d'")
         end_date = dt.strptime(end_date, '%Y-%m-%d')
         end_date_string = end_date.strftime("'%Y-%m-%d'")
-        sql_query_4 = sql_query_4 + str(value) + "') AND time BETWEEN " + start_date_string + " AND " + end_date_string + " GROUP BY LENGTH(text);"
+        sql_query_4 = sql_query_4 + str(value) + "') AND time BETWEEN " + start_date_string + " AND " + end_date_string \
+	    + " GROUP BY LENGTH(text);"
     query_results_4=pd.read_sql_query(sql_query_4,con)
     revs_4 = []
     for i in range(0,query_results_4.shape[0]):
@@ -238,11 +258,17 @@ def page_4_output(value, start_date, end_date):
         return dcc.Graph(
                     id='example4',
                     figure={
-                        'data': [{'x': query_results_4['length'], 'y': query_results_4['frequency'], 'type': 'line', 'name': 'Users'}],
+                        'data': [{'x': query_results_4['length'], 'y': query_results_4['frequency'], \
+			    'type': 'line', 'name': 'Users'}],
                         'layout': {
                             'title': 'Length of edits by ' + str(value),
-                            'xaxis': {'title': 'Number of characters in article'},
-			    'yaxis': {'title': 'Number of edits'},
+			    'titlefont': {'size': 60},
+                            'xaxis': {'title': 'Number of characters in article',
+				      'titlefont': {'size': 30},
+				      'tickfont': {'size': 30}},
+			    'yaxis': {'title': 'Number of edits',
+				      'titlefont': {'size': 30},
+				      'tickfont': {'size': 30}},
                         }
                     }, className = 'graph',
                 )
