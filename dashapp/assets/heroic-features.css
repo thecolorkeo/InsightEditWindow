@@ -6,21 +6,23 @@
  */
 
 .button1 {
-    border-radius: 6px;
+    border-radius: 10vh;
     background-color: #E8E9FE;
+    border: 2px #555555;
     color: black;
-    border: 2px solid #555555;
     float: none;
     width: 22%;
     height: 8em;
     vertical-align: top;
-    font-size: 2.5em;
+    font-size: 3vh;
     display: inline-block;
     transition-duration: .5s;
     margin: 1%;
+    font-family: 'Open Sans', times, sans-serif;
 }
 .button1:hover {
-    background-color: #967CFE;
+    color: black;
+    background-color: #008CBA;
 }
 
 .app-header {
@@ -32,6 +34,7 @@
     margin: 0;
     padding: 0;
     overflow: hidden;
+    font-family: 'Open Sans', times, sans-serif;
 }
 
 .header-button {
@@ -42,7 +45,6 @@
     font-size: 2vh;
     color: white;
     text-decoration: none;
-    font-family: sans-serif;
 }
 .header-button:hover {
     background-color: #111;
@@ -50,7 +52,7 @@
 
 .page-title {
     font-size: 6vh;
-    font-family: sans-serif;
+    font-family: 'Open Sans', times, sans-serif;
     text-align: left;
     padding: 2.5vh 0 0 0;
 }
@@ -60,4 +62,9 @@
     height: 75vh;
     width: 200vh;
     font-size: 48;
+}
+
+.page-text {
+    font-size: 2vh;
+    font-family: 'Open Sans', times, sans-serif;
 }
