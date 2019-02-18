@@ -34,11 +34,13 @@ app.layout = html.Div([
         dcc.Link('Contact', className = 'header-button', href = '/contact'),
         html.A('Resume', href = 'https://rawcdn.githack.com/thecolorkeo/Resume/ab63fb2f799f3b78fac5c71f5f47360b1dfca3c3/Keo_Chan_Final.pdf', \
 	    target = '_blank', className = 'header-button'),
+        dcc.Link('EditWindow', className = 'header-button', href = '/', style = {'float': 'right', 'class': 'active'})
     ], className = 'app-header'),
     html.Div(id='page-content'),
 ])
 
 
+# Query for index page figure
 sql_query_0 = "SELECT CAST(time AS DATE), count(*) as frequency FROM revs " \
     + "WHERE time BETWEEN '2018-10-01' AND '2018-12-31' GROUP BY CAST(time AS DATE)"
 query_results_0 = pd.read_sql_query(sql_query_0, con)
@@ -61,7 +63,7 @@ index_page = html.Div([
             figure={
                 'data': [{'x': query_results_0['time'], 'y': query_results_0['frequency'], 'type': 'line', 'name': 'Users'}],
                 'layout': {
-                    'title': 'Most recent 3 months of edits',
+                    'title': 'Most recent 3 months of sitewide edits',
 		    'titlefont': {'size': 60},
 		    'yaxis': {'tickfont': {'size': 30}},
                     'xaxis': {
@@ -181,6 +183,7 @@ def clicked_1(clickData, start_date, end_date):
                     }, className = 'graph',
                 )
 
+
 page_2_layout = html.Div([
     html.Div('Most Edits in 2018 (without bots)', className='page-title'),
     html.Div(id='page-2-content'), html.Br(),
@@ -195,8 +198,10 @@ page_2_layout = html.Div([
     html.Div('(Press page up/down to switch months quickly)', style = {'font-size': '2vh'}),
     html.Div(id='output-container-date-picker-range-2'), html.Br(),
     html.Div('Click on one of the bars to see more statistics', style = {'font-size': '3vh'}), html.Br(),
+    html.Div('Adjust the time window with the date picker at the top of the page', style = {'font-size': '2vh'}), html.Br(),
     html.Div(id='click_output_2'),
 ])
+# Callback for initial page load from date picker
 @app.callback(
     dash.dependencies.Output('output-container-date-picker-range-2', 'children'),
     [dash.dependencies.Input('my-date-picker-range-2', 'start_date'),
@@ -233,8 +238,8 @@ def page_2_output(start_date, end_date):
 @app.callback(
     dash.dependencies.Output('click_output_2', 'children'),
     [dash.dependencies.Input('example-2', 'clickData'),
-     dash.dependencies.Input('my-date-picker-range-2', 'start_date'), #########
-     dash.dependencies.Input('my-date-picker-range-2', 'end_date')]) ########
+     dash.dependencies.Input('my-date-picker-range-2', 'start_date'),
+     dash.dependencies.Input('my-date-picker-range-2', 'end_date')])
 def clicked_2(clickData, start_date, end_date):
     value = clickData['points'][0]['x']
     sql_query = "SELECT CAST(time AS DATE), count(*) as frequency FROM revs WHERE lower(username) = lower('"
@@ -272,6 +277,7 @@ def clicked_2(clickData, start_date, end_date):
                         }
                     }, className = 'graph',
                 )
+
 
 page_3_layout = html.Div([
     html.Div('Frequency of edits by user', className='page-title'),
@@ -329,6 +335,7 @@ def page_3_output(value, start_date, end_date):
 			}
 	            }, className = 'graph',
 	        )
+
 
 page_4_layout = html.Div([
     html.Div('Length of pages edited by user', className='page-title'),
@@ -390,10 +397,9 @@ contact_layout = html.Div([
     html.Div('keozchan@gmail.com', style = {'font-size': '2vh'}), html.Br(),
     html.Div(html.A('linkedin.com/in/keozchan', href = 'https://linkedin.com/in/keozchan', target = '_blank'), \
              style = {'font-size': '2vh', 'color': 'black', 'text-decoration': 'none'}), html.Br(),
-    html.Div(html.A('Github', href = 'https://github.com/thecolorkeo/InsightWiki', target = '_blank'), \
+    html.Div(html.A('Or take a look at my github.', href = 'https://github.com/thecolorkeo/InsightWiki', target = '_blank'), \
              style = {'font-size': '2vh', 'color': 'black', 'text-decoration': 'none'}), html.Br(),
 ])
-
 
 
 # Pagenav callback

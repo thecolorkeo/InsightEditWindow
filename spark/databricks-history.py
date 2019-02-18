@@ -29,7 +29,8 @@ def xmlWriteFrom (num):
 	jdbcPort = "5432"
 	jdbcUrl = "jdbc:postgresql://{0}:{1}/{2}".format(jdbcHostname, jdbcPort, jdbcDatabase)
 
-	df.select("id", "text", "time", "contributor.username").write.jdbc(url=jdbcUrl, table="history"+num, properties=connectionProperties, mode="append")
+	df.select("id", "text", "time", "contributor.username") \
+		.write.jdbc(url=jdbcUrl, table="history"+num, properties=connectionProperties, mode="append")
 
 if __name__ == '__main__':
 	xmlWriteFrom(sys.argv[1])

@@ -2,6 +2,11 @@ from pyspark.sql import SparkSession
 from pyspark.sql.types import *
 from pyspark.sql.functions import explode
 
+'''
+Unit test for Wikipedia's
+NYC page entry.
+'''
+
 spark = SparkSession.builder.getOrCreate()
 
 def xmlWriteFrom (file):
@@ -22,6 +27,7 @@ def xmlWriteFrom (file):
 	jdbcPort = "5432"
 	jdbcUrl = "jdbc:postgresql://{0}:{1}/{2}".format(jdbcHostname, jdbcPort, jdbcDatabase)
 
-	df2.select('id', 'rev.text', 'rev.timestamp').write.jdbc(url=jdbcUrl, table='revs', properties=connectionProperties, mode='overwrite')
+	df2.select('id', 'rev.text', 'rev.timestamp') \
+		.write.jdbc(url=jdbcUrl, table='revs', properties=connectionProperties, mode='overwrite')
 
 xmlWriteFrom("s3n://keo-s3-1/wiki-nyc.xml.bz2")

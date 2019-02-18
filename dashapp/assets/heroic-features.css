@@ -1,8 +1,10 @@
 /*!
- * Start Bootstrap - Heroic Features (https://startbootstrap.com/template-overviews/heroic-features)
- * Copyright 2013-2019 Start Bootstrap
- * Licensed under MIT (https://github.com/BlackrockDigital/startbootstrap-heroic-features/blob/master/LICENSE)
+ * Styles for app2.py Dash script.                                                                  
+ * Store in a folder called assets 
+ * that is in the same directory
+ * as app2.py.
  */
+
 .button1 {
     border-radius: 6px;
     background-color: #E8E9FE;
@@ -12,9 +14,9 @@
     width: 22%;
     height: 8em;
     vertical-align: top;
-    font-size:2.5em;
+    font-size: 2.5em;
     display: inline-block;
-    transition-duration: .4s;
+    transition-duration: .5s;
     margin: 1%;
 }
 .button1:hover {
@@ -43,7 +45,7 @@
     font-family: sans-serif;
 }
 .header-button:hover {
-  background-color: #111;
+    background-color: #111;
 }
 
 .page-title {
