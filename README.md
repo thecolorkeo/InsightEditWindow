@@ -32,8 +32,8 @@ To access the latest versions of all Wikipedia pages including all revisions, go
 XML parsing package with spark: https://github.com/databricks/spark-xml
 
 ### Cluster set up
-- 4 m4.2xlarge EC2 nodes with Spark and Hadoop set up
-- 1 r4.4xlarge EC2 node for TimescaleDB and Flask, needs at least 800GB of storage volume
+- (4) m4.2xlarge EC2 nodes with Spark and Hadoop set up
+- (1) r4.4xlarge EC2 node for TimescaleDB and Flask, needs at least 800GB of storage volume
 
 ### Environment
 Install AWS CLI and [Pegasus](https://github.com/InsightDataScience/pegasus), which is Insight's automatic cluster creator. Set the configuration in workers.yml and master.yml (3 workers and 1 master), then use Pegasus commands to spin up the cluster and install Hadoop and Spark. Follow the [instructions on Timescale's website](https://blog.timescale.com/tutorial-installing-timescaledb-on-aws-c8602b767a98/) for how to install Timescale on an EC2 instance.
