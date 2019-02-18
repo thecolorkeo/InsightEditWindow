@@ -7,6 +7,11 @@ from datetime import datetime as dt
 import pandas as pd
 import psycopg2
 
+'''
+Dash website that queries Timescale.
+'''
+
+# Custom CSS styles are stored in assets/heroic-assets.css
 app = dash.Dash(__name__, static_folder='assets')
 app.scripts.config.serve_locally=True
 app.css.config.serve_locally=True
@@ -82,8 +87,9 @@ page_1_layout = html.Div([
         max_date_allowed=dt.today(),
 	start_date=dt(2018, 1, 1),
         end_date=dt(2018, 12, 31),
+	day_size=60,
     ),
-    html.H5("(Press page up/down to switch month quickly)"), html.Br(),
+    html.Div('(Press page up/down to switch months quickly)', style = {'font-size': '2vh'}),
     html.Div(id='output-container-date-picker-range-1'), html.Br(),
 ])
 @app.callback(
@@ -128,9 +134,10 @@ page_2_layout = html.Div([
         min_date_allowed=dt(2001, 1, 15),
         max_date_allowed=dt.today(),
         start_date=dt(2018, 1, 1),
-        end_date=dt(2018, 12, 31)
+        end_date=dt(2018, 12, 31),
+        day_size=60,
     ),
-    html.H5("(Press page up/down to switch month quickly)"), html.Br(),
+    html.Div('(Press page up/down to switch months quickly)', style = {'font-size': '2vh'}),
     html.Div(id='output-container-date-picker-range-2'), html.Br()
 ])
 @app.callback(
@@ -169,14 +176,16 @@ def page_2_output(start_date, end_date):
 page_3_layout = html.Div([
     html.Div('Frequency of edits by user', className='page-title'),
     html.Div(id='page-3-content'), html.Br(),
-    dcc.Input(id='name-picker-3', type='text',value='cluebot ng'), html.Br(),
+    dcc.Input(id='name-picker-3', type='text', value='cluebot ng', style = {'font-size': '4vh'}), html.Br(),
     dcc.DatePickerRange(
         id='my-date-picker-range-3',
         min_date_allowed=dt(2001, 1, 15),
         max_date_allowed=dt.today(),
         start_date=dt(2008, 1, 1),
-        end_date=dt(2018, 12, 31)
+        end_date=dt(2018, 12, 31),
+        day_size=60,
     ),
+    html.Div('(Press page up/down to switch months quickly)', style = {'font-size': '2vh'}),
     html.Div(id='output-container-3'), html.Br(),
 ])
 @app.callback(
@@ -224,14 +233,16 @@ def page_3_output(value, start_date, end_date):
 page_4_layout = html.Div([
     html.Div('Length of pages edited by user', className='page-title'),
     html.Div(id='page-4-content'), html.Br(),
-    dcc.Input(id='name-picker-4', type='text',value='cluebot ng'), html.Br(),
+    dcc.Input(id='name-picker-4', type='text',value='cluebot ng', style = {'font-size': '4vh'}), html.Br(),
     dcc.DatePickerRange(
         id='my-date-picker-range-4',
         min_date_allowed=dt(2001, 1, 15),
         max_date_allowed=dt.today(),
         start_date=dt(2018, 1, 1),
-        end_date=dt(2018, 12, 31)
+        end_date=dt(2018, 12, 31),
+        day_size=60,
     ),
+    html.Div('(Press page up/down to switch months quickly)', style = {'font-size': '2vh'}),
     html.Div(id='output-container-4'), html.Br(),
 ])
 @app.callback(
