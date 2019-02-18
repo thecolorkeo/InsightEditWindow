@@ -1,0 +1,134 @@
+import dash
+import flask
+#from flask import render_template
+import dash_core_components as dcc
+import dash_html_components as html
+from dash.dependencies import Input, Output
+from sqlalchemy import create_engine
+from sqlalchemy_utils import database_exists, create_database
+from datetime import datetime as dt
+import pandas as pd
+import plotly
+import plotly.graph_objs as go
+import psycopg2
+
+
+server = flask.Flask(__name__)
+app = dash.Dash(__name__, server=server, static_folder='assets')
+app.scripts.config.serve_locally=True
+app.css.config.serve_locally=True
+app.config.suppress_callback_exceptions = True
+
+user = 'postgres'
+host = '0.0.0.0'
+dbname = 'pages'
+db = create_engine('postgres://%s%s/%s'%(user,host,dbname))
+con = None
+con = psycopg2.connect(database = dbname, user = user, password='password', host='localhost')
+
+
+app.layout = html.Div([
+    dcc.Location(id='url', refresh=False),
+    html.Div(className='app-header'),
+    html.Div(id='page-content')
+])
+
+
+index_page = html.Div([
+    html.H1("EditWindow by Keo Chan"),
+    dcc.Link(html.Button('Go to Page 1', className='button1'), href='/page-1'),
+    dcc.Link(html.Button('Go to Page 2', className='button1'), href='/page-2')
+])
+
+
+sql_query = "SELECT username, count(*) as frequency FROM revs WHERE username IS NOT NULL AND time BETWEEN '2008-01-01' AND '2009-01-01' GROUP BY username ORDER BY count(*) DESC LIMIT 10;"
+query_results=pd.read_sql_query(sql_query,con)
+revs = []
+for i in range(0,query_results.shape[0]):
+    revs.append(dict(username=query_results.iloc[i]['username'], frequency=query_results.iloc[i]['frequency']))
+page_1_layout = html.Div([
+    html.H1('Page 1'),
+    dcc.Link(html.Button('Go back to home'), href='/'), html.Br(),
+    html.Div(id='page-1-content'), html.Br(),
+	    dcc.DatePickerRange(
+        id='date-picker-range',
+        start_date=dt(1997, 5, 3),
+        end_date_placeholder_text='Select a date!'
+    ), html.Br(),
+    dcc.Graph(
+        id='example',
+        figure={
+            'data': [{'x': query_results['username'], 'y': query_results['frequency'], 'type': 'bar', 'name': 'Users'}],
+            'layout': {
+		'title': 'Most active users',
+		'height': 700, 'width': 1200}
+        })
+])
+
+@app.callback(dash.dependencies.Output('page-1-content', 'children'),
+              [dash.dependencies.Input('page-1-dropdown', 'value')])
+def page_1_dropdown(value):
+    return 'You have selected "{}"'.format(value)
+
+
+sql_query2 = "SELECT username, count(*) as frequency FROM revs WHERE lower(username) NOT LIKE '%bot%' AND time BETWEEN '2008-01-01' AND '2009-01-01' GROUP BY username ORDER BY count(*) DESC LIMIT 10;"
+query_results2=pd.read_sql_query(sql_query2,con)
+revs2 = []
+for i in range(0,query_results2.shape[0]):
+    revs.append(dict(username=query_results2.iloc[i]['username'], frequency=query_results2.iloc[i]['frequency']))
+page_2_layout = html.Div([
+    html.H1('Page 2'),
+    dcc.Link(html.Button('Go back to home'), href='/'), html.Br(),
+    html.Div(id='page-1-content'), html.Br(),
+    dcc.DatePickerRange(
+        id='date-picker-range',
+        start_date=dt(1997, 5, 3),
+        end_date_placeholder_text='Select a date!'
+    ), html.Br(),
+    html.H5('Select start time'),
+    html.Div(id='page-2-content'), html.Br(),
+    dcc.Link('Go to Page 1', href='/page-1'), html.Br(),
+    dcc.Link('Go back to home', href='/'),
+    html.Div(children=html.Div(id='graphs2'), className='row'),
+    dcc.Graph(
+        id='example2',
+        figure={
+            'data': [
+                {'x': query_results2['username'], 'y': query_results2['frequency'], 'type': 'bar', 'name': 'Users'},
+            ],
+            'layout': {
+                'title': 'Most active non-bot users',
+		'height': 700, 'width': 1200
+            }
+        })
+])
+
+@app.callback(dash.dependencies.Output('page-2-content', 'children'),
+              [dash.dependencies.Input('page-2-radios', 'value')])
+def page_2_radios(value):
+    return 'You have selected "{}"'.format(value)
+
+
+# Update the index
+@app.callback(dash.dependencies.Output('page-content', 'children'),
+              [dash.dependencies.Input('url', 'pathname')])
+def display_page(pathname):
+    if pathname == '/page-1':
+        return page_1_layout
+    elif pathname == '/page-2':
+        return page_2_layout
+    else:
+        return index_page
+    # You could also return a 404 "URL not found" page here
+
+#external_css = ["https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css"]
+#for css in external_css:
+#    app.css.append_css({"external_url": css})
+
+#external_js = ['https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js']
+#for js in external_css:
+#    app.scripts.append_script({'external_url': js})
+
+
+if __name__ == '__main__':
+    app.run_server(debug=True, host='0.0.0.0') #port=80

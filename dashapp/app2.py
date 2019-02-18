@@ -22,23 +22,54 @@ con = psycopg2.connect(database = dbname, user = user, password='password', host
 
 app.layout = html.Div([
     html.Div(dcc.Location(id='url', refresh=False)),
-    html.Div(className='app-header'),
+    html.Div([
+	dcc.Link('Home', className = 'header-button', href = '/'),
+        html.A('About', href = 'https://github.com/thecolorkeo/InsightWiki', target = '_blank', className = 'header-button'),
+        dcc.Link('Contact', className = 'header-button', href = '/contact'),
+        html.A('Resume', href = 'https://rawcdn.githack.com/thecolorkeo/Resume/ab63fb2f799f3b78fac5c71f5f47360b1dfca3c3/Keo_Chan_Final.pdf', target = '_blank', className = 'header-button'),
+    ], className = 'app-header'),
     html.Div(id='page-content'),
 ])
 
 
+sql_query_0 = "SELECT CAST(time AS DATE), count(*) as frequency FROM revs WHERE time BETWEEN '2018-10-01' AND '2018-12-31' GROUP BY CAST(time AS DATE)"
+query_results_0 = pd.read_sql_query(sql_query_0, con)
+revs_0 = []
+for i in range(0,query_results_0.shape[0]):
+    revs_0.append(dict(time=query_results_0.iloc[i]['time'], frequency=query_results_0.iloc[i]['frequency']))
+
 index_page = html.Div([
-    html.H1("EditWindow by Keo Chan"),
-    dcc.Link(html.Button('MOST EDITS IN 2018: InternetArchiveBot', className='button1'), href='/page-1'),
-    dcc.Link(html.Button('MOST EDITS IN 2018 (non-bot): EP111', className='button1'), href='/page-2'),
-    dcc.Link(html.Button('EDIT FREQUENCY BY USER', className='button1'), href='/page-3'),
-    dcc.Link(html.Button('EDIT LENGTH BY USER', className='button1'), href='/page-4')
+    html.Div('Edit Window by Keo Chan', className = 'page-title', style = {'text-align': 'center'}),
+    html.Div([
+        dcc.Link(html.Button('MOST EDITS IN 2018: InternetArchiveBot', className = 'button1'), href = '/page-1'),
+        dcc.Link(html.Button('MOST EDITS IN 2018 (non-bot): Ser Amantio di Nicolao', className = 'button1'), href = '/page-2'),
+        dcc.Link(html.Button('EDIT FREQUENCY BY USER', className = 'button1'), href = '/page-3'),
+        dcc.Link(html.Button('EDIT LENGTH BY USER', className = 'button1'), href = '/page-4'),
+    ], style = {'text-align': 'center'}),
+    html.Br(),
+    html.Div([
+        dcc.Graph(
+	    id='example0',
+            figure={
+                'data': [{'x': query_results_0['time'], 'y': query_results_0['frequency'], 'type': 'line', 'name': 'Users'}],
+                'layout': {
+                    'title': 'Last 3 months of edits',
+                    'xaxis': {
+                       'type': 'date',
+                       'tickformat': '%Y-%m-%d',
+                       'tickmode': 'linear',
+                       'dtick': 86400000.0 * 7, #one day * x
+		       'font-size': 48,
+                    }
+                }
+            }, style = {'page-break-before': 'always', 'height': '75vh', 'width': '200vh', 'font-size': 48},
+        )
+    ])
 ])
 
 
 page_1_layout = html.Div([
-    html.H1('Most Edits in 2018'),
-    dcc.Link(html.Button('Go back to home'), href='/'), html.Br(),
+    html.Div('Most Edits in 2018', className='page-title'),
     html.Div(id='page-1-content'), html.Br(),
     dcc.DatePickerRange(
         id='my-date-picker-range-1',
@@ -48,7 +79,7 @@ page_1_layout = html.Div([
         end_date=dt(2018, 12, 31),
     ),
     html.H5("(Press page up/down to switch month quickly)"), html.Br(),
-    html.Div(id='output-container-date-picker-range-1'), html.Br()
+    html.Div(id='output-container-date-picker-range-1'), html.Br(),
 ])
 @app.callback(
     dash.dependencies.Output('output-container-date-picker-range-1', 'children'),
@@ -62,7 +93,7 @@ def page_1_output(start_date, end_date):
         end_date = dt.strptime(end_date, '%Y-%m-%d')
         end_date_string = end_date.strftime("'%Y-%m-%d'")
         sql_query = sql_query + start_date_string + " AND " + end_date_string + " GROUP BY username ORDER BY count(*) DESC LIMIT 10;"
-    query_results=pd.read_sql_query(sql_query,con)
+    query_results = pd.read_sql_query(sql_query,con)
     revs = []
     for i in range(0,query_results.shape[0]):
         revs.append(dict(username=query_results.iloc[i]['username'], frequency=query_results.iloc[i]['frequency']))
@@ -70,18 +101,15 @@ def page_1_output(start_date, end_date):
         return 'Select a date to see it displayed here'
     else:
         return dcc.Graph(
-	       id='example',
-	       figure={
-	           'data': [{'x': query_results['username'], 'y': query_results['frequency'], 'type': 'bar', 'name': 'Users'}],
-	           'layout': {
-	               'title': 'Most Edits',
-	               'height': 700, 'width': 1200}
-	           }
-	       )
+	           id='example',
+	           figure={
+	               'data': [{'x': query_results['username'], 'y': query_results['frequency'], 'type': 'bar', 'name': 'Users'}],
+	               'layout': {'title': 'Most Edits',}
+	           }, className = 'graph',
+	)
 
 page_2_layout = html.Div([
-    html.H1('Most Edits in 2018 (without bots)'),
-    dcc.Link(html.Button('Go back to home'), href='/'), html.Br(),
+    html.Div('Most Edits in 2018 (without bots)', className='page-title'),
     html.Div(id='page-2-content'), html.Br(),
     dcc.DatePickerRange(
         id='my-date-picker-range-2',
@@ -92,7 +120,6 @@ page_2_layout = html.Div([
     ),
     html.H5("(Press page up/down to switch month quickly)"), html.Br(),
     html.Div(id='output-container-date-picker-range-2'), html.Br()
-
 ])
 @app.callback(
     dash.dependencies.Output('output-container-date-picker-range-2', 'children'),
@@ -113,21 +140,21 @@ def page_2_output(start_date, end_date):
     if len(sql_query_2) == 0:
         return 'Select a date to see it displayed here'
     else:
-        return [sql_query_2,
-                dcc.Graph(
+        return dcc.Graph(
                 id='example',
                 figure={
                     'data': [{'x': query_results_2['username'], 'y': query_results_2['frequency'], 'type': 'bar', 'name': 'Users'}],
-                    'layout': {
-                        'title': 'Most Edits (non-bot)',
-                        'height': 700, 'width': 1200}
-                    }
-                )
-        ]
+                    'layout': {'title': 'Most Edits (non-bot)'}
+                }, className = 'graph',
+        )
+@app.callback(
+    dash.dependencies.Output('test', 'children'),
+    [dash.dependencies.Input('example', 'clickData')])
+def page_2_con(clickData):
+    return index_page
 
 page_3_layout = html.Div([
-    html.H1('Frequency of edits by user'),
-    dcc.Link(html.Button('Go back to home'), href='/'), html.Br(),
+    html.Div('Frequency of edits by user', className='page-title'),
     html.Div(id='page-3-content'), html.Br(),
     dcc.Input(id='name-picker-3', type='text',value='cluebot ng'), html.Br(),
     dcc.DatePickerRange(
@@ -155,12 +182,11 @@ def page_3_output(value, start_date, end_date):
     query_results_3=pd.read_sql_query(sql_query_3,con)
     revs_3 = []
     for i in range(0,query_results_3.shape[0]):
-        revs_3.append(dict(username=query_results_3.iloc[i]['time'], frequency=query_results_3.iloc[i]['frequency']))
+        revs_3.append(dict(time=query_results_3.iloc[i]['time'], frequency=query_results_3.iloc[i]['frequency']))
     if len(sql_query_3) == 0:
         return 'Select a date to see it displayed here'
     else:
-        return [sql_query_3,
-                dcc.Graph(
+        return dcc.Graph(
 	            id='example3',
 	    	    figure={
 	                'data': [{'x': query_results_3['time'], 'y': query_results_3['frequency'], 'type': 'line', 'name': 'Users'}],
@@ -171,17 +197,13 @@ def page_3_output(value, start_date, end_date):
 	                       'tickformat': '%Y-%m-%d',
 	                       'tickmode': 'linear',
 	                       'dtick': 86400000.0*29.5 #one day * x
-	                    },
-	                    'height': 700, 'width': 1200
+	                    }
 			}
-	            }
+	            }, className = 'graph',
 	        )
-        ]
-
 
 page_4_layout = html.Div([
-    html.H1('Length of pages edited by user'),
-    dcc.Link(html.Button('Go back to home'), href='/'), html.Br(),
+    html.Div('Length of pages edited by user', className='page-title'),
     html.Div(id='page-4-content'), html.Br(),
     dcc.Input(id='name-picker-4', type='text',value='cluebot ng'), html.Br(),
     dcc.DatePickerRange(
@@ -213,8 +235,7 @@ def page_4_output(value, start_date, end_date):
     if len(sql_query_4) == 0:
         return 'Select a date to see it displayed here'
     else:
-        return [sql_query_4,
-                dcc.Graph(
+        return dcc.Graph(
                     id='example4',
                     figure={
                         'data': [{'x': query_results_4['length'], 'y': query_results_4['frequency'], 'type': 'line', 'name': 'Users'}],
@@ -222,11 +243,19 @@ def page_4_output(value, start_date, end_date):
                             'title': 'Length of edits by ' + str(value),
                             'xaxis': {'title': 'Number of characters in article'},
 			    'yaxis': {'title': 'Number of edits'},
-                            'height': 700, 'width': 1200
                         }
-                    }
+                    }, className = 'graph',
                 )
-        ]
+
+contact_layout = html.Div([
+    html.Div('Keo Chan | Data Engineer', className='page-title'), html.Br(),
+    html.Div("Like my page? I'm looking for a job. Contact me at:", style = {'font-size': '2vh'}), html.Br(),
+    html.Div('keozchan@gmail.com', style = {'font-size': '2vh'}), html.Br(),
+    html.Div(html.A('linkedin.com/in/keozchan', href = 'https://linkedin.com/in/keozchan', target = '_blank'), \
+             style = {'font-size': '2vh', 'color': 'black', 'text-decoration': 'none'}), html.Br(),
+    html.Div(html.A('Github', href = 'https://github.com/thecolorkeo/InsightWiki', target = '_blank'), \
+             style = {'font-size': '2vh', 'color': 'black', 'text-decoration': 'none'}), html.Br(),
+])
 
 
 
@@ -242,10 +271,13 @@ def display_page(pathname):
         return page_3_layout
     elif pathname == '/page-4':
         return page_4_layout
+    elif pathname == '/contact':
+	return contact_layout
     else:
         return index_page
 
 
-# Run with sudo python app2.py for port 80
+
+# Run with `sudo python app2.py` for port 80
 if __name__ == '__main__':
     app.run_server(debug=True, host='0.0.0.0', port=80)
