@@ -3,12 +3,20 @@ from pyspark.sql import SparkSession
 from pyspark.sql.types import *
 from pyspark.sql.functions import explode
 
+'''
+Parses one XML file from S3 bucket
+to TimescaleDB. Takes one argument
+from command line which should be
+an integer between 1 and 27.
+'''
+
 spark = SparkSession.builder.getOrCreate()
 
 def xmlWriteFrom (num):
 	df_raw = spark.read.format("xml") \
 		.options(rowTag="revision", excludeAttribute=True) \
-		.load("s3n://keo-s3-2/history"+num+".xml.bz2").persist()
+		.load("s3n://keo-s3-2/history" + num + ".xml.bz2").persist()
+	# convert time string to timestamp
 	df = df_raw.withColumn("time", df_raw.timestamp.cast(TimestampType()))
 
 	connectionProperties = {
@@ -21,6 +29,8 @@ def xmlWriteFrom (num):
 	jdbcPort = "5432"
 	jdbcUrl = "jdbc:postgresql://{0}:{1}/{2}".format(jdbcHostname, jdbcPort, jdbcDatabase)
 
-	df.select("id", "text", "time", "contributor.username").write.jdbc(url=jdbcUrl, table="history"+num, properties=connectionProperties, mode="append")
+	df.select("id", "text", "time", "contributor.username") \
+		.write.jdbc(url=jdbcUrl, table="history"+num, properties=connectionProperties, mode="append")
 
-xmlWriteFrom(sys.argv[1])
+if __name__ == '__main__':
+	xmlWriteFrom(sys.argv[1])

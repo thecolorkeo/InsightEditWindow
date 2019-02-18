@@ -3,6 +3,17 @@ from airflow.operators.bash_operator import BashOperator
 from datetime import datetime, timedelta
 import os
 
+'''
+This DAG automates the Spark part of the pipeline,
+which reads XMLs from S3 and parses them into Timescale.
+Wikipedia XML dumps are released in 27 parts, so
+it was useful to have airflow run them in sequence.
+Eventually, this could be extended to automate the
+downloading of the files into S3 originally and
+the final processing steps in Timescale.
+'''
+
+
 #generic spark submit
 sparkSubmit = 'spark-submit --master spark://ec2-3-93-99-240.compute-1.amazonaws.com:7077 --conf spark.executor.extraJavaOptions="-XX:MaxPermSize=6g" --driver-memory 28g --executor-memory 6500m --executor-cores 1 --packages com.databricks:spark-xml_2.11:0.4.1,org.postgresql:postgresql:42.2.5 ~/databricks-history.py '
 
