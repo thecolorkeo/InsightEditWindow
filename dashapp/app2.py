@@ -92,9 +92,8 @@ page_1_layout = html.Div([
         end_date=dt(2018, 12, 31),
 	day_size=60,
     ),
-    html.Div('(Press page up/down to switch months quickly)', style = {'font-size': '2vh'}),
-    html.Div(id='output-container-date-picker-range-1'), html.Br(),
     html.Div('Click on one of the bars to see more statistics', style = {'font-size': '3vh'}), html.Br(),
+    html.Div(id='output-container-date-picker-range-1'), html.Br(),
     dcc.DatePickerRange(
         id='my-date-picker-range-1.1',
         min_date_allowed=dt(2001, 1, 15),
@@ -195,9 +194,8 @@ page_2_layout = html.Div([
         end_date=dt(2018, 12, 31),
         day_size=60,
     ),
-    html.Div('(Press page up/down to switch months quickly)', style = {'font-size': '2vh'}),
-    html.Div(id='output-container-date-picker-range-2'), html.Br(),
     html.Div('Click on one of the bars to see more statistics', style = {'font-size': '3vh'}), html.Br(),
+    html.Div(id='output-container-date-picker-range-2'), html.Br(),
     html.Div('Adjust the time window with the date picker at the top of the page', style = {'font-size': '2vh'}), html.Br(),
     html.Div(id='click_output_2'),
 ])
@@ -291,7 +289,6 @@ page_3_layout = html.Div([
         end_date=dt(2018, 12, 31),
         day_size=60,
     ),
-    html.Div('(Press page up/down to switch months quickly)', style = {'font-size': '2vh'}),
     html.Div(id='output-container-3'), html.Br(),
 ])
 @app.callback(
@@ -349,7 +346,6 @@ page_4_layout = html.Div([
         end_date=dt(2018, 12, 31),
         day_size=60,
     ),
-    html.Div('(Press page up/down to switch months quickly)', style = {'font-size': '2vh'}),
     html.Div(id='output-container-4'), html.Br(),
 ])
 @app.callback(
