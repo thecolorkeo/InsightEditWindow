@@ -393,12 +393,14 @@ def page_4_output(value, start_date, end_date):
 
 contact_layout = html.Div([
     html.Div('Keo Chan | Data Engineer', className='page-title'), html.Br(),
-    html.Div("Like my page? I'm looking for a job. Contact me at:", style = {'font-size': '2vh'}), html.Br(),
-    html.Div('keozchan@gmail.com', style = {'font-size': '2vh'}), html.Br(),
+    html.Div("Like my page? I'm looking for a job. Contact me at:", className='page-text'), html.Br(),
+    html.Div('keozchan@gmail.com', className='page-text'), html.Br(),
     html.Div(html.A('linkedin.com/in/keozchan', href = 'https://linkedin.com/in/keozchan', target = '_blank'), \
-             style = {'font-size': '2vh', 'color': 'black', 'text-decoration': 'none'}), html.Br(),
+	     className='page-text',
+             style = {'font-size': '2vh'}), html.Br(),
     html.Div(html.A('Or take a look at my github.', href = 'https://github.com/thecolorkeo/InsightWiki', target = '_blank'), \
-             style = {'font-size': '2vh', 'color': 'black', 'text-decoration': 'none'}), html.Br(),
+	     className='page-text'),
+             html.Br(),
 ])
 
 
