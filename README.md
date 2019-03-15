@@ -51,7 +51,7 @@ Install AWS CLI and [Pegasus](https://github.com/InsightDataScience/pegasus), wh
 | Hadoop       | v2.7.6 |
 | Spark | v2.7.6 |
 | Databricks XML | v0.4.1 |
-| Postgres (TimescaleDB) | v10 |
+| Postgres (TimescaleDB) | v10.6 |
 
 ### Getting Started
 Start Spark and Hadoop on your EC2 cluster.
