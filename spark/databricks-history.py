@@ -8,12 +8,12 @@ Parses one XML file from S3 bucket
 to TimescaleDB.
 '''
 
-spark = SparkSession.builder.getOrCreate()
-
 def main(num):
 	'''
 	@num: int in range(1, 27). Corresponds to file name suffix in S3 bucket
 	'''
+	
+	spark = SparkSession.builder.getOrCreate()
 	
 	df_raw = spark.read.format("xml") \
 		.options(rowTag="revision", excludeAttribute=True) \
@@ -21,10 +21,9 @@ def main(num):
 	# convert time string to timestamp
 	df = df_raw.withColumn("time", df_raw.timestamp.cast(TimestampType()))
 
-	# postgres credentials, adapt to your server location
+	# postgres credentials, in the future I'd like to save this as env variables
 	connectionProperties = {
 		"user":"postgres",
-		"password":"password",
 		"driver":"org.postgresql.Driver"
 	}
 	jdbcHostname = "ec2-3-94-24-76.compute-1.amazonaws.com"
