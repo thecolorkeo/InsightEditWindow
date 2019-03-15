@@ -10,6 +10,10 @@ import json
 
 '''
 Dash website that queries Timescale.
+Website was designed to allow users to explore
+the data in a flexible way, namely selecting date
+intervals of interest and querying any username on
+Wikipedia for a range of predefined topics.
 '''
 
 # Custom CSS styles are stored in assets/heroic-assets.css
@@ -294,6 +298,7 @@ page_3_layout = html.Div([
     html.Div('(Press page up/down to switch months quickly)', style = {'font-size': '2vh'}),
     html.Div(id='output-container-3'), html.Br(),
 ])
+# Callback for figure output from date picker
 @app.callback(
     dash.dependencies.Output('output-container-3', 'children'),
     [dash.dependencies.Input('name-picker-3', 'value'),
@@ -352,6 +357,7 @@ page_4_layout = html.Div([
     html.Div('(Press page up/down to switch months quickly)', style = {'font-size': '2vh'}),
     html.Div(id='output-container-4'), html.Br(),
 ])
+# Callback for figure output from date picker
 @app.callback(
     dash.dependencies.Output('output-container-4', 'children'),
     [dash.dependencies.Input('name-picker-4', 'value'),
@@ -391,6 +397,7 @@ def page_4_output(value, start_date, end_date):
                     }, className = 'graph',
                 )
 
+# Contact page
 contact_layout = html.Div([
     html.Div('Keo Chan | Data Engineer', className='page-title'), html.Br(),
     html.Div("Like my page? I'm looking for a job. Contact me at:", className='page-text'), html.Br(),
@@ -404,7 +411,7 @@ contact_layout = html.Div([
 ])
 
 
-# Pagenav callback
+# Page navigation callback
 @app.callback(dash.dependencies.Output('page-content', 'children'),
               [dash.dependencies.Input('url', 'pathname')])
 def display_page(pathname):
@@ -423,6 +430,6 @@ def display_page(pathname):
 
 
 
-# Run with `sudo python app2.py` for port 80
+# Run with `sudo python app2.py` for port 80 (needs sudo permission)
 if __name__ == '__main__':
     app.run_server(debug=True, host='0.0.0.0', port=80)
