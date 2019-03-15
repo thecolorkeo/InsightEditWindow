@@ -10,7 +10,7 @@ to TimescaleDB.
 
 spark = SparkSession.builder.getOrCreate()
 
-def xmlWriteFrom (num):
+def main(num):
 	'''
 	@num: int in range(1, 27). Corresponds to file name suffix in S3 bucket
 	'''
@@ -36,4 +36,4 @@ def xmlWriteFrom (num):
 		.write.jdbc(url=jdbcUrl, table="history"+num, properties=connectionProperties, mode="append")
 
 if __name__ == '__main__':
-	xmlWriteFrom(sys.argv[1])
+	main(sys.argv[1])
