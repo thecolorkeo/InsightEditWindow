@@ -73,7 +73,7 @@ Create a [hypertable](https://docs.timescale.com/v1.0/getting-started/creating-h
 
 Run Dashapp on port 80
 ```
-    sudo python app2.py
+    sudo python app.py
 ```
 
 ### Testing
