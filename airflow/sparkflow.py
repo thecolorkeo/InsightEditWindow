@@ -14,7 +14,7 @@ the final processing steps in Timescale.
 '''
 
 
-#generic spark submit
+# generic spark submit
 sparkSubmit = 'spark-submit --master spark://ec2-3-93-99-240.compute-1.amazonaws.com:7077 --conf spark.executor.extraJavaOptions="-XX:MaxPermSize=6g" --driver-memory 28g --executor-memory 6500m --executor-cores 1 --packages com.databricks:spark-xml_2.11:0.4.1,org.postgresql:postgresql:42.2.5 ~/databricks-history.py '
 
 #define dag
@@ -25,10 +25,12 @@ default_args = {
     'retries': 5,
     'retry_delay': timedelta(minutes=5),
 }
+
 dag = DAG('sparkflow',
     default_args=default_args,
     schedule_interval='@once')
 
+# future: would like to run as loop instead of listing numbers 1-27
 spark1 = BashOperator(
     task_id = 'spark1',
     bash_command = sparkSubmit + '1',
