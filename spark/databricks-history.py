@@ -1,3 +1,4 @@
+import os
 import sys
 from pyspark.sql import SparkSession
 from pyspark.sql.types import *
@@ -21,18 +22,22 @@ def main(num):
 	# convert time string to timestamp
 	df = df_raw.withColumn("time", df_raw.timestamp.cast(TimestampType()))
 
-	# postgres credentials, in the future I'd like to save this as env variables
+	# postgres credentials
 	connectionProperties = {
-		"user":"postgres",
+		"user": ["POSTGRES_USER"],
+		"password": os.environ["POSTGRES_PASSWORD"],
 		"driver":"org.postgresql.Driver"
 	}
-	jdbcHostname = "ec2-3-94-24-76.compute-1.amazonaws.com"
+	jdbcHostname = os.environ["POSTGRES_URL"]
 	jdbcDatabase = "pages"
 	jdbcPort = "5432"
 	jdbcUrl = "jdbc:postgresql://{0}:{1}/{2}".format(jdbcHostname, jdbcPort, jdbcDatabase)
 
 	df.select("id", "text", "time", "contributor.username") \
-		.write.jdbc(url=jdbcUrl, table="history"+num, properties=connectionProperties, mode="append")
+		.write.jdbc(url=jdbcUrl, table="history"+num, properties=connectionProperties, mode="overwrite")
 
 if __name__ == '__main__':
 	main(sys.argv[1])
+    	os.environ["POSTGRES_URL"] = sys.argv[2]
+    	os.environ["POSTGRES_USER"] = sys.argv[3]
+    	os.environ["POSTGRES_PASSWORD"] = sys.argv[4]
