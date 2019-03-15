@@ -23,7 +23,17 @@ Some interesting things to look at might be:
 S3 -> Spark -> TimescaleDB (Postgres) -> Dash 
 ![alt text](https://github.com/thecolorkeo/InsightWiki/blob/dev/Pipeline.png "EditWindow Pipeline")
 
+EditWindow is a batch processing pipeline built to handle fast queries over a large volume of data.
+
 I downloaded revision history from all pages on the English version of Wikipedia to an S3 bucket, which were in the form of zipped XMLs. I used Spark (Databricks Spark XML package) to parse these xmls into a dataframe. I wrote these files out to TimescaleDB, and created an interactive website with Plotly Dash and Flask. I used Airflow to automate downloading and parsing the Wikipedia files from S3.
+
+| Directory                    | Description of Contents
+|:---------------------------- |:---------------------------------------- |
+| `airflow/sparkflow.py`       | Runs spark job for every partition in S3 |
+| `dashapp/*`                  | HTML and CSS that queries DB and builds the UI |
+| `spark/databricks-history.py`| Reads from S3, unzips, parses, and writes into TimescaleDB   |
+| `spark-up-history.sh`        | Shell script to run spark job            |
+| `test`                       | Unit test for NYC's wikipedia page       |
 
 Data Source: https://dumps.wikimedia.org/enwiki/latest/
 
@@ -36,18 +46,35 @@ To access the latest versions of all Wikipedia pages including all revisions, go
 ### Environment
 Install AWS CLI and [Pegasus](https://github.com/InsightDataScience/pegasus), which is Insight's automatic cluster creator. Set the configuration in workers.yml and master.yml (3 workers and 1 master), then use Pegasus commands to spin up the cluster and install Hadoop and Spark. Download (clone) the databricks [XML parsing package](https://github.com/databricks/spark-xml) and follow the setup instructions that they provide. Follow the [instructions on Timescale's website](https://blog.timescale.com/tutorial-installing-timescaledb-on-aws-c8602b767a98/) for how to install Timescale on an EC2 instance using Postgres 10.
 
-Versioning:
-Hadoop: v2.7.6
-Spark: v2.3.1
-Databricks: v0.4.1
-Postgres: v10
+| Technology     | Version No.
+|:-------------- |:----------- |
+| Hadoop       | v2.7.6 |
+| Spark | v2.7.6 |
+| Databricks XML | v0.4.1 |
+| Postgres (TimescaleDB) | v10 |
 
 ### Getting Started
 Start Spark and Hadoop on your EC2 cluster.
+```
+    peg service <cluster-name> hadoop start
+    peg service <cluster-name> spark start
+```
 
-Download the 27 files off wikipedia's website into an S3 bucket with the name format `"history<#>.xml.<__>.bz2"` and replace # with the respective number between 1 and 27. Create a [hypertable](https://docs.timescale.com/v1.0/getting-started/creating-hypertables) in TimescaleDB called `revs`. Then, run `spark-up-history.sh #` for each of the files in S3.
+Download the 27 files off wikipedia's website into an S3 bucket with the name format `"history<#>.xml.<__>.bz2"` and replace # with the respective number between 1 and 27.
+ ```
+    curl <wikidump link> <s3 bucket loc> ...
+ ```
 
-Run "sudo python app2.py" from the dashapp folder to start the website on port 80 of the EC2 instance running Timescale.
+Create a [hypertable](https://docs.timescale.com/v1.0/getting-started/creating-hypertables) in TimescaleDB called `revs`. Then, run `spark-up-history.sh #` to populate revs with each of the files in S3.
+
+```
+   SELECT create_hypertable('revs', 'time');
+```
+
+Run Dashapp on port 80
+```
+    sudo python app2.py
+```
 
 ### Testing
 Wikipedia offers the option to [download individual pages](https://en.wikipedia.org/wiki/Special:Export) in xml format. The folder test/ contains a unit test for the entry for New York City.
