@@ -8,9 +8,13 @@ This DAG automates the Spark part of the pipeline,
 which reads XMLs from S3 and parses them into Timescale.
 Wikipedia XML dumps are released in 27 parts, so
 it was useful to have airflow run them in sequence.
-Eventually, this could be extended to automate the
-downloading of the files into S3 originally and
-the final processing steps in Timescale.
+
+I would classify my use of Airflow as work-in-progress.
+I want to find a way to avoid writing the same code
+27 times, as right now it works but is bad code. Also
+on the to do list is to automate downloading the files
+into S3 originally. This is intended as a framework that
+could be augmented in the future.
 '''
 
 
