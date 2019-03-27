@@ -18,18 +18,19 @@ def main(num):
 	
 	df_raw = spark.read.format("xml") \
 		.options(rowTag="revision", excludeAttribute=True) \
-		.load("s3n://keo-s3-2/history" + num + ".xml.bz2").persist()
+		.load("s3n://keo-s3-2/history" + num + ".xml.bz2") \
+		.persist()
 	# convert time string to timestamp
 	df = df_raw.withColumn("time", df_raw.timestamp.cast(TimestampType()))
 
 	# postgres credentials
 	connectionProperties = {
-		"user": ["POSTGRES_USER"],
+		"user": os.environ["POSTGRES_USER"],
 		"password": os.environ["POSTGRES_PASSWORD"],
 		"driver":"org.postgresql.Driver"
 	}
 	jdbcHostname = os.environ["POSTGRES_URL"]
-	jdbcDatabase = "pages"
+	jdbcDatabase = os.environ["POSTGRES_DBNAME"]
 	jdbcPort = "5432"
 	jdbcUrl = "jdbc:postgresql://{0}:{1}/{2}".format(jdbcHostname, jdbcPort, jdbcDatabase)
 
@@ -41,3 +42,4 @@ if __name__ == '__main__':
     	os.environ["POSTGRES_URL"] = sys.argv[2]
     	os.environ["POSTGRES_USER"] = sys.argv[3]
     	os.environ["POSTGRES_PASSWORD"] = sys.argv[4]
+	os.environ["POSTGRES_DBNAME"] = sys.argv[5]
