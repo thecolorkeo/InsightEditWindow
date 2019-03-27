@@ -14,6 +14,17 @@ Website was designed to allow users to explore
 the data in a flexible way, namely selecting date
 intervals of interest and querying any username on
 Wikipedia for a range of predefined topics.
+
+Contains design for 6 webpages:
+- Landing page
+- Contact page
+- Top users over a given time period, by edit #
+- Top users over a given time period, by edit #, excluding bots
+- Single user's frequency of edits per day over a given time period
+- Single user's lengths of pages edited over a given time period (histogram)
+
+Each page has date and/or name selectors that allow users to choose
+inputs and see a graph that corresponds to their selections.
 '''
 
 # Custom CSS styles are stored in assets/heroic-assets.css
@@ -30,6 +41,7 @@ con = None
 con = psycopg2.connect(database = dbname, user = user, password='password', host='localhost')
 
 
+# Header navigation bar
 app.layout = html.Div([
     html.Div(dcc.Location(id='url', refresh=False)),
     html.Div([
@@ -44,7 +56,7 @@ app.layout = html.Div([
 ])
 
 
-# Query for index page figure
+# Query database to load landing page graph
 sql_query_0 = "SELECT CAST(time AS DATE), count(*) as frequency FROM revs " \
     + "WHERE time BETWEEN '2018-10-01' AND '2018-12-31' GROUP BY CAST(time AS DATE)"
 query_results_0 = pd.read_sql_query(sql_query_0, con)
@@ -52,6 +64,7 @@ revs_0 = []
 for i in range(0,query_results_0.shape[0]):
     revs_0.append(dict(time=query_results_0.iloc[i]['time'], frequency=query_results_0.iloc[i]['frequency']))
 
+# Construct landing page: 4 buttons for top stats, and graph of most recent 3 months of activity
 index_page = html.Div([
     html.Div('Edit Window by Keo Chan', className = 'page-title', style = {'text-align': 'center'}),
     html.Div([
@@ -85,9 +98,11 @@ index_page = html.Div([
 ])
 
 
+# Page 1: Top ten users who made the most edits in 2018
 page_1_layout = html.Div([
     html.Div('Most Edits in 2018', className='page-title'),
     html.Div(id='page-1-content'), html.Br(),
+    # Allow user to pick a range of date over which to calc top 10 edits
     dcc.DatePickerRange(
         id='my-date-picker-range-1',
         min_date_allowed=dt(2001, 1, 15),
@@ -98,6 +113,7 @@ page_1_layout = html.Div([
     ),
     html.Div('(Press page up/down to switch months quickly)', style = {'font-size': '2vh'}),
     html.Div(id='output-container-date-picker-range-1'), html.Br(),
+    # Allow user to click a bar on the graph to load a single user's edit history
     html.Div('Click on one of the bars to see more statistics', style = {'font-size': '3vh'}), html.Br(),
     dcc.DatePickerRange(
         id='my-date-picker-range-1.1',
@@ -109,7 +125,8 @@ page_1_layout = html.Div([
     ),
     html.Div(id='click_output'), html.Br(),
 ])
-# Callback for first date picker
+# Callback to let user control date picker
+# Accepts date from date picker, queries database and returns updated graph to display
 @app.callback(
     dash.dependencies.Output('output-container-date-picker-range-1', 'children'),
     [dash.dependencies.Input('my-date-picker-range-1', 'start_date'),
@@ -143,7 +160,7 @@ def page_1_output(start_date, end_date):
 
 	           }, className = 'graph',
 	)
-# Callback for click event on graph 1
+# Callback to load a single user's history after clicking on the initial graph
 @app.callback(
     dash.dependencies.Output('click_output', 'children'),
     [dash.dependencies.Input('example1', 'clickData'),
@@ -188,9 +205,11 @@ def clicked_1(clickData, start_date, end_date):
                 )
 
 
+# Page 2: Top ten users who made the most edits in 2018 excluding bots
 page_2_layout = html.Div([
     html.Div('Most Edits in 2018 (without bots)', className='page-title'),
     html.Div(id='page-2-content'), html.Br(),
+    # Allow user to pick a range of date over which to calc top 10 edits
     dcc.DatePickerRange(
         id='my-date-picker-range-2',
         min_date_allowed=dt(2001, 1, 15),
@@ -205,7 +224,7 @@ page_2_layout = html.Div([
     html.Div('Adjust the time window with the date picker at the top of the page', style = {'font-size': '2vh'}), html.Br(),
     html.Div(id='click_output_2'),
 ])
-# Callback for initial page load from date picker
+# Update graph based on dates that user selects in datepicker
 @app.callback(
     dash.dependencies.Output('output-container-date-picker-range-2', 'children'),
     [dash.dependencies.Input('my-date-picker-range-2', 'start_date'),
@@ -238,7 +257,8 @@ def page_2_output(start_date, end_date):
                     }
                 }, className = 'graph',
         )
-# Callback for click event on graph 2
+# Load a single user's full edit history if they click on that user's name on the first graph
+# Triggered by user clicking a name, and returns an updated graph for the user they selected
 @app.callback(
     dash.dependencies.Output('click_output_2', 'children'),
     [dash.dependencies.Input('example-2', 'clickData'),
@@ -283,10 +303,12 @@ def clicked_2(clickData, start_date, end_date):
                 )
 
 
+# Page 3: Select a user and a time period and see the number of edits they made per day
 page_3_layout = html.Div([
     html.Div('Frequency of edits by user', className='page-title'),
     html.Div(id='page-3-content'), html.Br(),
     dcc.Input(id='name-picker-3', type='text', value='Ser Amantio Di Nicolao', style = {'font-size': '4vh'}), html.Br(),
+    # Select date range to query
     dcc.DatePickerRange(
         id='my-date-picker-range-3',
         min_date_allowed=dt(2001, 1, 15),
@@ -298,7 +320,7 @@ page_3_layout = html.Div([
     html.Div('(Press page up/down to switch months quickly)', style = {'font-size': '2vh'}),
     html.Div(id='output-container-3'), html.Br(),
 ])
-# Callback for figure output from date picker
+# Input dates and username selected in date & name picker and return updated graph
 @app.callback(
     dash.dependencies.Output('output-container-3', 'children'),
     [dash.dependencies.Input('name-picker-3', 'value'),
@@ -342,9 +364,11 @@ def page_3_output(value, start_date, end_date):
 	        )
 
 
+# Page 4: Select a user and time period and see a histogram of the lengths of pages that they edited
 page_4_layout = html.Div([
     html.Div('Length of pages edited by user', className='page-title'),
     html.Div(id='page-4-content'), html.Br(),
+    # User can select name and date
     dcc.Input(id='name-picker-4', type='text',value='Ser Amantio Di Nicolao', style = {'font-size': '4vh'}), html.Br(),
     dcc.DatePickerRange(
         id='my-date-picker-range-4',
@@ -357,7 +381,7 @@ page_4_layout = html.Div([
     html.Div('(Press page up/down to switch months quickly)', style = {'font-size': '2vh'}),
     html.Div(id='output-container-4'), html.Br(),
 ])
-# Callback for figure output from date picker
+# Accepts username and date range and returns updated graph of edit pattern
 @app.callback(
     dash.dependencies.Output('output-container-4', 'children'),
     [dash.dependencies.Input('name-picker-4', 'value'),
@@ -411,7 +435,7 @@ contact_layout = html.Div([
 ])
 
 
-# Page navigation callback
+# Callback that updates page layout when you click a navigation button
 @app.callback(dash.dependencies.Output('page-content', 'children'),
               [dash.dependencies.Input('url', 'pathname')])
 def display_page(pathname):
